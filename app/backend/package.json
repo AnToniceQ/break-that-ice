@@ -1,0 +1,27 @@
+{
+  "name": "@break-that-ice/backend",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "type:check": "tsc --noEmit",
+    "dev": "tsx watch src/server.ts",
+    "build:clear": "rm -rf dist",
+    "build": "tsup --config tsup.config.ts"
+  },
+  "dependencies": {
+    "@break-that-ice/shared": "*",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.2",
+    "@types/express-session": "^1.18.0",
+    "@types/node": "^25.5.2",
+    "tsup": "^8.5.0",
+    "tsx": "^4.19.4",
+    "typescript": "^6.0.2"
+  }
+}

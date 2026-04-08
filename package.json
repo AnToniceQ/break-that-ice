@@ -1,0 +1,50 @@
+{
+  "name": "break-that-ice",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "app/frontend",
+    "app/backend",
+    "app/shared"
+  ],
+  "scripts": {
+    "prepare": "husky",
+    "type:check": "tsc --noEmit && npm run type:check -w @break-that-ice/frontend && npm run type:check -w @break-that-ice/backend && npm run type:check -w @break-that-ice/shared",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "dev": "dotenv -e .env.development -- concurrently \"npm run dev -w @break-that-ice/backend\" \"npm run dev -w @break-that-ice/frontend\"",
+    "build:all:clear": "npm run build:clear -w @break-that-ice/shared && npm run build:clear -w @break-that-ice/backend && npm run build:clear -w @break-that-ice/frontend",
+    "build:all": "npm run build -w @break-that-ice/shared && npm run build -w @break-that-ice/backend && npm run build -w @break-that-ice/frontend",
+    "build:bundle": "tsx scripts/build-bundle.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.5.2",
+    "concurrently": "^9.1.2",
+    "dotenv-cli": "^11.0.0",
+    "eslint": "^10.2.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.8.0",
+    "husky": "^9.1.7",
+    "jiti": "^2.6.1",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.1",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.58.0",
+    "vue-eslint-parser": "^10.4.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,vue,json,jsonc,mjs,cjs}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{md,yml,yaml,css,scss,html}": [
+      "prettier --write"
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@break-that-ice/shared",
+  "private": true,
+  "sideEffects": false,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    "./socket": {
+      "import": "./dist/socket/index.js",
+      "types": "./dist/socket/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "type:check": "tsc --noEmit",
+    "build:clear": "rm -rf dist && rm tsconfig.tsbuildinfo",
+    "build": "tsc -b"
+  }
+}
