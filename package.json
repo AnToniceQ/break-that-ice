@@ -14,7 +14,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint . --fix",
     "lint:check": "eslint .",
-    "dev": "dotenv -e .env.development -- concurrently \"npm run dev -w @break-that-ice/backend\" \"npm run dev -w @break-that-ice/frontend\"",
+    "dev": "dotenv -e .env -- npm run dev -w @break-that-ice/backend",
     "build:all:clear": "npm run build:clear -w @break-that-ice/shared && npm run build:clear -w @break-that-ice/backend && npm run build:clear -w @break-that-ice/frontend",
     "build:all": "npm run build -w @break-that-ice/shared && npm run build -w @break-that-ice/backend && npm run build -w @break-that-ice/frontend",
     "build:bundle": "tsx scripts/build-bundle.ts"

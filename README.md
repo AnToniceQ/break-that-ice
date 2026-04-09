@@ -23,15 +23,16 @@ Features:
 ## Quick Start
 
 ```bash
-cp .env.development.example .env.development
+cp .env.example .env
 npm install
 npm run dev
 ```
 
 The app opens at:
 
-- Frontend: `http://localhost:5173`
-- Backend API: `http://localhost:3000`
+- App + API: `http://localhost:3001`
+
+Backend is the only server process. In development, it mounts Vite in middleware mode for Vue HMR.
 
 ## Architecture
 
@@ -48,7 +49,7 @@ From the repo root, managed via npm workspaces:
 npm run type:check           # TypeScript type checking for all packages
 npm run format               # Format code with Prettier
 npm run lint                 # Lint and fix with ESLint
-npm run dev                  # Run backend + frontend concurrently
+npm run dev                  # Run backend server (with Vite middleware in dev)
 
 # Building
 npm run build:all            # Build shared → backend → frontend
