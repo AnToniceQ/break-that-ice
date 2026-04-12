@@ -15,7 +15,7 @@ RUN apt-get update
 # Just ensuring the file exists -> ENV_HUSKY is 0, thus husky is not initialized anyway.
 COPY .husky/install.mts .husky/install.mts
 
-COPY .nvmrc ./
+COPY .npmrc ./
 COPY package*.json ./
 COPY app/shared/package*.json ./app/shared/
 COPY app/backend/package*.json ./app/backend/
