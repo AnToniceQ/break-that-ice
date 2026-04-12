@@ -1,0 +1,49 @@
+# ---- Build stage ----
+FROM node:22 AS build
+
+WORKDIR /project
+
+ARG NODE_ENV=production
+
+ENV NODE_ENV=$NODE_ENV
+
+RUN apt-get update
+
+COPY . ./
+
+RUN npm ci --include=dev
+RUN npm run build:app
+
+# ---- Backend runtime deps stage ----
+FROM node:22 AS backend-deps
+
+WORKDIR /project
+
+ARG NODE_ENV=production
+
+ENV NODE_ENV=$NODE_ENV
+
+# Just ensuring the file exists -> NODE_ENV is production, thus husky is not initialized anyway.
+COPY .husky/install.mts .husky/install.mts
+
+COPY .nvmrc ./
+COPY package*.json ./
+COPY app/backend/package*.json ./app/backend/
+COPY app/shared/package*.json ./app/shared/
+
+RUN npm ci -w @break-that-ice/backend --omit=dev
+
+# ---- Runtime stage ----
+FROM node:22-slim AS runtime
+
+WORKDIR /app
+
+ARG NODE_ENV=production
+
+ENV NODE_ENV=$NODE_ENV
+ENV FRONTEND_DIR=/app/public
+ENV FRONTEND_INDEX_FILE=index.html
+
+COPY --from=backend-deps /project/node_modules ./node_modules
+COPY --from=build /project/app/backend/dist/main.prod.js ./server.js
+COPY --from=build /project/app/frontend/dist ./public

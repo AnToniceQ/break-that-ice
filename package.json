@@ -3,32 +3,29 @@
   "private": true,
   "version": "0.1.0",
   "workspaces": [
-    "app/frontend",
+    "app/shared",
     "app/backend",
-    "app/shared"
+    "app/frontend"
   ],
   "scripts": {
-    "prepare": "husky",
-    "type:check": "tsc --noEmit && npm run type:check -w @break-that-ice/frontend && npm run type:check -w @break-that-ice/backend && npm run type:check -w @break-that-ice/shared",
+    "prepare": "node .husky/install.mts",
+    "dev": "npm run dev -w @break-that-ice/backend",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint . --fix",
-    "lint:check": "eslint .",
-    "dev": "dotenv -e .env -- npm run dev -w @break-that-ice/backend",
-    "build:all:clear": "npm run build:clear -w @break-that-ice/shared && npm run build:clear -w @break-that-ice/backend && npm run build:clear -w @break-that-ice/frontend",
-    "build:all": "npm run build -w @break-that-ice/shared && npm run build -w @break-that-ice/backend && npm run build -w @break-that-ice/frontend",
-    "build:bundle": "tsx scripts/build-bundle.ts"
+    "lint": "eslint --fix",
+    "lint:check": "eslint",
+    "type:check": "tsc --noEmit && npm run type:check -w @break-that-ice/frontend && npm run type:check -w @break-that-ice/backend && npm run type:check -w @break-that-ice/shared",
+    "quality": "npm run format:check && npm run lint:check && npm run type:check",
+    "build:app:clear": "npm run build:clear -w @break-that-ice/backend && npm run build:clear -w @break-that-ice/frontend",
+    "build:app": "npm run build -w @break-that-ice/backend && npm run build -w @break-that-ice/frontend"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^25.5.2",
-    "concurrently": "^9.1.2",
-    "dotenv-cli": "^11.0.0",
     "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^10.8.0",
     "husky": "^9.1.7",
-    "jiti": "^2.6.1",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.1",
     "typescript": "^6.0.2",
@@ -40,7 +37,7 @@
     "npm": "10.x"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx,vue,json,jsonc,mjs,cjs}": [
+    "*.{ts,tsx,js,jsx,vue,json,jsonc,mjs,mts,cjs}": [
       "prettier --write",
       "eslint --fix"
     ],

@@ -14,12 +14,7 @@
       "types": "./dist/utils/index.d.ts"
     }
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "type:check": "tsc --noEmit",
-    "build:clear": "rm -rf dist && rm tsconfig.tsbuildinfo",
-    "build": "tsc -b"
+    "type:check": "tsc --noEmit"
   }
 }

@@ -1,10 +1,10 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/server.ts"],
+  entry: ["src/main.prod.ts"],
   format: ["esm"],
   platform: "node",
-  target: "node20",
+  target: "node22",
   treeshake: true,
   splitting: false,
   outDir: "dist",

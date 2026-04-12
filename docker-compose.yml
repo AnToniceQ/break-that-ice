@@ -1,0 +1,27 @@
+services:
+  prod-app:
+    profiles: ["prod"]
+    working_dir: /app
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    ports:
+      - "${EXTERNAL_SERVER_PORT}:${INTERNAL_SERVER_PORT}"
+    environment:
+      - INTERNAL_SERVER_PORT=${INTERNAL_SERVER_PORT}
+    command: node server.js
+
+  dev-app:
+    profiles: ["dev"]
+    working_dir: /project
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./app:/project/app
+    ports:
+      - "${EXTERNAL_SERVER_PORT}:${INTERNAL_SERVER_PORT}"
+    environment:
+      - INTERNAL_SERVER_PORT=${INTERNAL_SERVER_PORT}
+    command: npm run dev

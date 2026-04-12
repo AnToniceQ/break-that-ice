@@ -3,10 +3,9 @@
   "private": true,
   "type": "module",
   "version": "0.1.0",
-  "main": "dist/server.js",
   "scripts": {
     "type:check": "tsc --noEmit",
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch src/main.dev.ts",
     "build:clear": "rm -rf dist",
     "build": "tsup --config tsup.config.ts"
   },

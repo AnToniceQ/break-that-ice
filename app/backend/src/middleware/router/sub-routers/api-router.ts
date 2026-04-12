@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-export function createApiRouter() {
+export function createApiRouter(): Router {
   const router = Router();
 
   router.get("/health", (_req, res) => {
