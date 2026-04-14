@@ -3,6 +3,7 @@ FROM node:22 AS build
 
 WORKDIR /project
 
+ARG MINIFY_BACKEND_BUILD
 ARG NODE_ENV=production
 
 ENV NODE_ENV=$NODE_ENV
@@ -12,7 +13,7 @@ RUN apt-get update
 COPY . ./
 
 RUN npm ci --include=dev
-RUN npm run build:app
+RUN MINIFY_BACKEND_BUILD=$MINIFY_BACKEND_BUILD npm run build:app
 
 # ---- Backend runtime deps stage ----
 FROM node:22 AS backend-deps

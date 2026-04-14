@@ -1,5 +1,14 @@
 import { defineConfig } from "tsup";
 
+const minifyEnv = process.env.MINIFY_BACKEND_BUILD;
+
+if (minifyEnv !== "true" && minifyEnv !== "false")
+  throw new Error(
+    "Invalid value for environment variable MINIFY_BACKEND_BUILD. Expected 'true' or 'false'.",
+  );
+
+const minify = minifyEnv === "true";
+
 export default defineConfig({
   entry: ["src/main.prod.ts"],
   format: ["esm"],
@@ -9,5 +18,6 @@ export default defineConfig({
   splitting: false,
   outDir: "dist",
   clean: true,
+  minify,
   noExternal: ["@break-that-ice/shared"],
 });

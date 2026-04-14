@@ -31,7 +31,7 @@ npm install
 
 ## Docker (Development & Production)
 
-The repository is prepared for, and should be used with compose profiles.
+The repository is prepared for, and should be used with, docker & compose profiles.
 
 The app runs on the development container just as would on your machine (including HMR), just being represented by a more prod-like container.
 
@@ -52,8 +52,8 @@ docker compose up -d --build
 The backend needs these environments for local development:
 
 - `INTERNAL_SERVER_PORT`
-- `FRONTEND_INDEX_FILE`
 - `FRONTEND_DIR`
+- `FRONTEND_INDEX_FILE`
 
 ```bash
 INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./app/frontend/dist FRONTEND_INDEX_FILE=index.html npm run dev
@@ -63,9 +63,10 @@ INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./app/frontend/dist FRONTEND_INDEX_FILE=i
 
 The backend needs these environments for local production:
 
+- `MINIFY_BACKEND_BUILD`
 - `INTERNAL_SERVER_PORT`
-- `FRONTEND_INDEX_FILE`
 - `FRONTEND_DIR`
+- `FRONTEND_INDEX_FILE`
 
 Clean and build all packages:
 
@@ -75,7 +76,7 @@ npm run build:app
 ```
 
 ```bash
-INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./app/frontend/dist FRONTEND_INDEX_FILE=index.html node ./app/backend/dist/main.prod.js
+MINIFY_BACKEND_BUILD=false INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./../../frontend/dist FRONTEND_INDEX_FILE=index.html node ./app/backend/dist/main.prod.js
 ```
 
 ## Scripts
@@ -109,6 +110,10 @@ Quality gates are handled automatically by `husky` and `lint-staged`. They are c
 
 ## Environment Variables
 
+Backend production build variables:
+
+- `MINIFY_BACKEND_BUILD` - Whether to completely minify the `tsup` backend build
+
 Docker variables:
 
 - `EXTERNAL_SERVER_PORT` - Port forwarded from Docker to Host
@@ -119,11 +124,12 @@ Backend runtime variables:
 - `FRONTEND_DIR` - frontend root/static directory path
 - `FRONTEND_INDEX_FILE` - frontend entry file name
 
-Developer-specific variables (from `.env`):
+Developer-specific variables (from `.env`, if using docker, rest of needed environments are handled automatically):
 
 - `COMPOSE_PROFILES` - selected compose profile (`dev` or `prod`)
 - `INTERNAL_SERVER_PORT` - when app containerized, we recommend to keep it at `3000`; if app on Host, set to your needs
 - `EXTERNAL_SERVER_PORT` - when app containerized, set to your Host needs; if app on Host, this environemnt is not used at all
+- `MINIFY_BACKEND_BUILD` - `true` or `false`; if production build is needed during development, you can set whether the backend should be minified. We recommend `false` for better file readability.
 
 ## License
 

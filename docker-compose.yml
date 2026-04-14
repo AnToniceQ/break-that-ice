@@ -3,6 +3,8 @@ services:
     profiles: ["prod"]
     working_dir: /app
     build:
+      args:
+        - MINIFY_BACKEND_BUILD=${MINIFY_BACKEND_BUILD}
       context: .
       dockerfile: Dockerfile.prod
     restart: unless-stopped
