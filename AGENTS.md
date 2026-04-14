@@ -4,11 +4,18 @@ This file helps coding agents work safely and efficiently in this repository.
 
 ## Goal
 
-Maintain and evolve a monorepo app with:
+Maintain and evolve the TypeScript monorepo:
 
-- `app/backend` (Express + Socket.IO)
-- `app/frontend` (Vue + Vite)
-- `app/shared` (shared TypeScript package)
+- `app/backend` is the Express + Socket.IO runtime server.
+- `app/frontend` is the Vue 3 + Vite client.
+- `app/shared` is the shared TypeScript package used by the backend.
+
+## Repository Layout
+
+- Root workspace: `package.json`, `docker-compose.yml`, `Dockerfile.dev`, `Dockerfile.prod`.
+- Backend app: `app/backend`.
+- Frontend app: `app/frontend`.
+- Shared package: `app/shared`.
 
 ## Commands You Should Use
 
@@ -16,12 +23,15 @@ Run commands from repository root unless explicitly needed otherwise.
 
 ```bash
 npm install
+npm run dev
 npm run type:check
+npm run lint
 npm run lint:check
+npm run format
 npm run format:check
+npm run quality
 npm run build:app:clear
 npm run build:app
-npm run dev
 ```
 
 Workspace-specific commands:
@@ -29,28 +39,43 @@ Workspace-specific commands:
 ```bash
 npm run dev -w @break-that-ice/backend
 npm run build -w @break-that-ice/backend
+npm run build:clear -w @break-that-ice/backend
 npm run build -w @break-that-ice/frontend
-npm run build -w @break-that-ice/shared
+npm run build:clear -w @break-that-ice/frontend
+npm run type:check -w @break-that-ice/shared
 ```
 
-## Dev/Prod Runtime Model
+## Runtime Model
 
-- Backend is the only server process.
-- Development: backend mounts Vite middleware.
-- Production: backend serves built frontend static assets.
+- The backend is the only server process.
+- In development, the backend mounts Vite middleware for HMR.
+- In production, the backend serves the built frontend static files.
+- The backend reads its runtime config from environment variables rather than hard-coded paths.
 
-Important env vars used by backend runtime:
+## Environment Variables
 
-- `SERVER_PORT`
-- `FRONTEND_DIR`
-- `FRONTEND_INDEX_FILE`
+Backend runtime:
+
+- `INTERNAL_SERVER_PORT` is the port the HTTP server listens on.
+- `FRONTEND_DIR` points to the frontend root or built asset directory.
+- `FRONTEND_INDEX_FILE` sets the frontend entry file name.
+
+Backend build:
+
+- `MINIFY_BACKEND_BUILD` controls whether the tsup build is minified.
+
+Docker / compose:
+
+- `EXTERNAL_SERVER_PORT` is the host port published by compose.
+- `COMPOSE_PROFILES` selects the `dev` or `prod` compose profile.
 
 ## Docker Notes
 
-- Dev image: `Dockerfile.dev`
-- Prod image: `Dockerfile.prod`
-- Compose file uses profiles: `dev` and `prod`
-- `.env.example` documents compose variables
+- Dev image: `Dockerfile.dev`.
+- Prod image: `Dockerfile.prod`.
+- Compose uses `dev` and `prod` profiles.
+- `.env.example` documents the compose variables.
+- Dev compose mounts `app/frontend/node_modules` and `app/backend/node_modules` as anonymous volumes to keep host and container installs isolated.
 
 Run profiles with:
 
@@ -63,15 +88,17 @@ docker compose --profile prod up --build -d
 
 - Make minimal, targeted edits.
 - Do not revert unrelated user changes.
-- Keep scripts/docs synchronized with real package scripts.
-- If you remove dependencies, run `npm install` to update lockfile.
-- After changing runtime/build flow, always rerun:
+- Keep scripts and docs synchronized with the real package manifests.
+- If you remove dependencies, run `npm install` to update the lockfile.
+- After changing runtime or build flow, rerun:
   - `npm run type:check`
   - `npm run lint:check`
   - `npm run build:app:clear && npm run build:app`
 
 ## Current Known State
 
-- Root build scripts build backend and frontend (shared is not forced by root build:app).
-- Frontend currently has no direct runtime dependency on shared package.
-- Backend and frontend builds pass from a clean build state.
+- Root `build:app` targets backend and frontend only.
+- Root `type:check` includes shared.
+- Frontend does not import `@break-that-ice/shared` directly.
+- Backend depends on `@break-that-ice/shared`.
+- Backend env parsing expects `INTERNAL_SERVER_PORT`, not `SERVER_PORT`.
