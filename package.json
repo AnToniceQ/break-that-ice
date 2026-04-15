@@ -28,6 +28,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.1",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.58.0",
     "vue-eslint-parser": "^10.4.0"

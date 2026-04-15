@@ -1,0 +1,7 @@
+services:
+  app:
+    ports:
+      - "${EXTERNAL_SERVER_PORT}:3000"
+    environment:
+      - INTERNAL_SERVER_PORT=3000
+      - SECRETS_DIR=/run/secrets

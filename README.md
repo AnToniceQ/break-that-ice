@@ -13,9 +13,12 @@ TypeScript monorepo with an Express backend and Vue frontend. The backend is the
 │   ├── backend/   # Express + Socket.IO runtime
 │   ├── frontend/  # Vue 3 + Vite client
 │   └── shared/    # Shared TypeScript package
+├── compose.yml
+├── compose.dev.yml
+├── compose.prod.yml
 ├── Dockerfile.dev
 ├── Dockerfile.prod
-└── docker-compose.yml
+└── scripts/docker.ts
 ```
 
 ## Requirements
@@ -23,43 +26,79 @@ TypeScript monorepo with an Express backend and Vue frontend. The backend is the
 - Node.js `22.x`
 - npm `10.x`
 
-## Install
+## Preparation
+
+Install:
 
 ```bash
 npm install
+```
+
+Copy modifiable secrets:
+
+```bash
+cp -R .secrets.example/. .secrets/
 ```
 
 ## Development & production
 
 We aim to support both Host-based and Docker-based development, although using Docker is highly recommended.
 
-The `.env.example` represents environment variables to be used with Docker-based development. The application is setup for docker to automatically read these environment variables and use them in a needed scope, whether as build arguments, or runtime variables.
+The `.env` examples represents environment variables to be used with Docker-based development. The application is setup for docker to read these environment variables and use them in a needed scope, whether as build arguments, or runtime variables.
 
-If you intend to use Host-based development, feel free to modify the gitignored `.env` file to fit your own development workflow.
+If you intend to use Host-based development, feel free to modify the gitignored `.env` files to fit your own development workflow.
 
 ### Docker-based
 
-The repository is prepared for, and should be used with, docker compose profiles.
+The repository uses split compose files and a small TypeScript helper script to invoke Docker consistently:
 
-When in development profile, the app runs in the container just as would on your machine (including HMR), just being represented by a more production-like container.
+- `compose.yml` - shared service settings
+- `compose.dev.yml` - development overrides
+- `compose.prod.yml` - production overrides
 
-The `development` or `production` profile is chosen automatically based off of the `COMPOSE_PROFILES` environment variable.
+The helper command is:
+
+```bash
+npx tsx scripts/docker.ts <dev|prod> <docker compose args>
+```
+
+For development, prepare env files:
 
 ```bash
 cp .env.example .env
+cp .env.dev.example .env.dev
 ```
 
-Start up the profile:
+Start development:
 
 ```bash
-docker compose up -d --build
+npx tsx scripts/docker.ts dev up --build
+```
+
+Stop development:
+
+```bash
+npx tsx scripts/docker.ts dev down
+```
+
+For production, prepare env files:
+
+```bash
+cp .env.example .env
+cp .env.prod.example .env.prod
+```
+
+Start production:
+
+```bash
+npx tsx scripts/docker.ts prod up -d --build
 ```
 
 ### Host-based
 
 All commands below are written so that environment variables are passed directly to the command, making the `.env` file unnecessary.
 
-If you created your own custom `.env` file, feel free to adapt these commands accordingly.
+If you created your own custom Host-based `.env` files, feel free to adapt these commands accordingly.
 
 You can see all the variables/arguments needed in [Application environment](#application-environment).
 
@@ -68,7 +107,7 @@ You can see all the variables/arguments needed in [Application environment](#app
 Start the development server:
 
 ```bash
-INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./../frontend FRONTEND_INDEX_FILE=index.html npm run dev
+SECRETS_DIR=./../../.secrets INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./../frontend FRONTEND_INDEX_FILE=index.html npm run dev
 ```
 
 #### Production
@@ -83,7 +122,7 @@ MINIFY_BACKEND_BUILD=false npm run build:app
 Run the app:
 
 ```bash
-INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./../../frontend/dist FRONTEND_INDEX_FILE=index.html node ./app/backend/dist/main.prod.js
+SECRETS_DIR=./../../../.secrets INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./../../frontend/dist FRONTEND_INDEX_FILE=index.html node ./app/backend/dist/main.prod.js
 ```
 
 ### Using both Host-based and Docker-based development/production
@@ -140,15 +179,18 @@ Quality gates are handled automatically by `husky` and `lint-staged`. They are c
 
 ## Environments
 
+We believe that default values in environments obscure the true configuration and behavior of the application. Thus, every variable stated below is mandatory to be set (either by the host or Docker configuration), resulting in a failure of the application if not so.
+
 ### Application environment
 
 #### Production build arguments
 
-- `MINIFY_BACKEND_BUILD` - Whether to minify the `tsup` backend build
+- `MINIFY_BACKEND_BUILD` - `true` or `false`; whether to minify the `tsup` backend build
 
-#### Runtime variables:
+#### Runtime variables
 
-- `INTERNAL_SERVER_PORT` - Port the actual HTTP app is listening on
+- `SECRETS_DIR` - the directory from which the secret files are read from
+- `INTERNAL_SERVER_PORT` - port the actual HTTP app is listening on
 - `FRONTEND_DIR` - frontend root/static directory path
 - `FRONTEND_INDEX_FILE` - frontend entry file name
 
@@ -158,15 +200,32 @@ Quality gates are handled automatically by `husky` and `lint-staged`. They are c
 
 - `EXTERNAL_SERVER_PORT` - Port forwarded from Docker to Host
 
-#### Developer-specific .env file
+### Runtime secrets
 
-When using Docker-based development, the only things needed to be set by the developer are within the `.env.example` file.
+If on Docker, all secret files from `./.secrets.example` must exist within `./.secrets`.
+
+If on Host, all secret files from `./.secrets.example` must exist within the path in `SECRETS_DIR`.
+
+At the moment, no concrete secret files are defined yet in the template.
+
+### Developer-based .env file and secrets
+
+When using Docker-based development/production, the developer-managed files are:
+
+- `.env` (from `.env.example`)
+- `.env.dev` (from `.env.dev.example`)
+- `.env.prod` (from `.env.prod.example`)
+- `./.secrets` (from `./.secrets.example`)
 
 Any other arguments/variables are set by Docker automatically.
 
-- `COMPOSE_PROFILES` - selected compose profile (`dev` or `prod`)
-- `EXTERNAL_SERVER_PORT` - set to any open port on your Host
-- `MINIFY_BACKEND_BUILD` - `true` or `false`; if production build is needed during development, you can set whether the backend should be minified. We recommend `false` for better file readability.
+`scripts/docker.ts` always loads `.env` and mode-specific env (`.env.dev` or `.env.prod`).
+
+Recommended values:
+
+- `.env`: `EXTERNAL_SERVER_PORT` set to any open port on your Host
+- `.env.dev`: currently optional/empty
+- `.env.prod`: `MINIFY_BACKEND_BUILD=true|false` (we recommend `false` for easier production output readability while debugging)
 
 ## License
 

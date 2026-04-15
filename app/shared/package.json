@@ -6,15 +6,22 @@
   "type": "module",
   "exports": {
     "./socket": {
-      "import": "./dist/socket/index.js",
-      "types": "./dist/socket/index.d.ts"
+      "import": "./src/socket/index.ts",
+      "types": "./src/socket/index.ts"
     },
     "./utils": {
-      "import": "./dist/utils/index.js",
-      "types": "./dist/utils/index.d.ts"
+      "import": "./src/utils/index.ts",
+      "types": "./src/utils/index.ts"
+    },
+    "./config": {
+      "import": "./src/config/index.ts",
+      "types": "./src/config/index.ts"
     }
   },
   "scripts": {
     "type:check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0"
   }
 }

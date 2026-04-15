@@ -1,0 +1,14 @@
+# compose.dev.yaml
+services:
+  app:
+    working_dir: /project
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./app:/project/app
+      - /project/app/frontend/node_modules
+      - /project/app/backend/node_modules
+    ports:
+      - "${EXTERNAL_SERVER_PORT}:3000"
+    command: npm run dev

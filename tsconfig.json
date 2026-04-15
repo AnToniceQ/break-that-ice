@@ -3,5 +3,5 @@
     "types": ["node"],
     "noEmit": true
   },
-  "include": ["*.ts", ".husky/install.mts"]
+  "include": ["*.ts", "scripts/**/*.ts", ".husky/install.mts"]
 }
