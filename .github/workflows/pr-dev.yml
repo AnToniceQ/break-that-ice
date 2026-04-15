@@ -1,0 +1,10 @@
+name: Dev PR Checks
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  quality:
+    uses: ./.github/workflows/run-quality.yml

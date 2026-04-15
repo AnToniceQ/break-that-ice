@@ -1,0 +1,28 @@
+name: Run Test
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  run-test:
+    name: run-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests (if present)
+        run: npm run test --if-present
+
+      - name: Run E2E tests (if present)
+        run: npm run test:e2e --if-present

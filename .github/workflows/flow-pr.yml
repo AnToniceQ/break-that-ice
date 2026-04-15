@@ -1,0 +1,30 @@
+name: PR Flow Guard
+
+on:
+  pull_request:
+    branches:
+      - test
+      - main
+
+jobs:
+  guard:
+    name: enforce-pr-flow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR source and target branches
+        run: |
+          echo "Base branch: ${{ github.base_ref }}"
+          echo "Head branch: ${{ github.head_ref }}"
+
+          if [ "${{ github.base_ref }}" = "main" ] && [ "${{ github.head_ref }}" != "test" ]; then
+            echo "::error::Only pull requests from 'test' may be merged into 'main'."
+            exit 1
+          fi
+
+          if [ "${{ github.base_ref }}" = "test" ] && [ "${{ github.head_ref }}" != "dev" ]; then
+            echo "::error::Only pull requests from 'dev' may be merged into 'test'."
+            exit 1
+          fi
+
+          # dev accepts PRs from any branch
+          echo "Branch flow is valid."

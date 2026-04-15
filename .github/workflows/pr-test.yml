@@ -1,0 +1,10 @@
+name: Test PR Validation
+
+on:
+  pull_request:
+    branches:
+      - test
+
+jobs:
+  tests:
+    uses: ./.github/workflows/run-test.yml

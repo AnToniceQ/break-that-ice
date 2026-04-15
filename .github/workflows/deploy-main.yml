@@ -1,0 +1,32 @@
+name: Deploy Main
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+jobs:
+  deploy-production:
+    name: deploy-production
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy on production host over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.PRODUCTION_APP_DIR }}"
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+            docker compose --profile prod up -d --build
