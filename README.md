@@ -13,12 +13,14 @@ TypeScript monorepo with an Express backend and Vue frontend. The backend is the
 │   ├── backend/   # Express + Socket.IO runtime
 │   ├── frontend/  # Vue 3 + Vite client
 │   └── shared/    # Shared TypeScript package
-├── compose.yml
-├── compose.dev.yml
-├── compose.prod.yml
-├── Dockerfile.dev
-├── Dockerfile.prod
-└── scripts/docker.ts
+├── docker/
+│   ├── compose.yml
+│   ├── compose.dev.yml
+│   ├── compose.prod.yml
+│   ├── Dockerfile.dev
+│   ├── Dockerfile.prod
+│   └── compose.ts
+└── package.json
 ```
 
 ## Requirements
@@ -52,14 +54,14 @@ If you intend to use Host-based development, feel free to modify the gitignored 
 
 The repository uses split compose files and a small TypeScript helper script to invoke Docker consistently:
 
-- `compose.yml` - shared service settings
-- `compose.dev.yml` - development overrides
-- `compose.prod.yml` - production overrides
+- `docker/compose.yml` - shared service settings
+- `docker/compose.dev.yml` - development overrides
+- `docker/compose.prod.yml` - production overrides
 
 The helper command is:
 
 ```bash
-npx tsx scripts/docker.ts <dev|prod> <docker compose args>
+npm run docker:compose -- <dev|prod> <docker compose args>
 ```
 
 For development, prepare env files:
@@ -72,13 +74,13 @@ cp .env.dev.example .env.dev
 Start development:
 
 ```bash
-npx tsx scripts/docker.ts dev up --build
+npm run docker:compose -- dev up --build
 ```
 
 Stop development:
 
 ```bash
-npx tsx scripts/docker.ts dev down
+npm run docker:compose -- dev down
 ```
 
 For production, prepare env files:
@@ -91,7 +93,7 @@ cp .env.prod.example .env.prod
 Start production:
 
 ```bash
-npx tsx scripts/docker.ts prod up -d --build
+npm run docker:compose -- prod up -d --build
 ```
 
 ### Host-based
@@ -150,6 +152,7 @@ This issue is truly only Host-related. The ownership change does not affect the 
 ## Scripts
 
 - `npm run dev` - start backend in dev mode with Vite middleware
+- `npm run docker:compose -- <dev|prod> <docker compose args>` - run Docker compose through the repository wrapper script
 - `npm run type:check` - run type checks across root, frontend, backend, shared
 - `npm run lint` - lint and auto-fix
 - `npm run lint:check` - lint without auto-fix
@@ -219,7 +222,7 @@ When using Docker-based development/production, the developer-managed files are:
 
 Any other arguments/variables are set by Docker automatically.
 
-`scripts/docker.ts` always loads `.env` and mode-specific env (`.env.dev` or `.env.prod`).
+`docker/compose.ts` always loads `.env` and mode-specific env (`.env.dev` or `.env.prod`).
 
 Recommended values:
 

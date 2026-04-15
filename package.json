@@ -10,6 +10,7 @@
   "scripts": {
     "prepare": "node .husky/install.mts",
     "dev": "npm run dev -w @break-that-ice/backend",
+    "docker:compose": "npx tsx docker/compose.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint --fix .",

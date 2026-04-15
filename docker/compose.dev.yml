@@ -3,10 +3,10 @@ services:
   app:
     working_dir: /project
     build:
-      context: .
-      dockerfile: Dockerfile.dev
+      context: ..
+      dockerfile: docker/Dockerfile.dev
     volumes:
-      - ./app:/project/app
+      - ../app:/project/app
       - /project/app/frontend/node_modules
       - /project/app/backend/node_modules
     ports:

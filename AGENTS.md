@@ -12,7 +12,7 @@ Maintain and evolve the TypeScript monorepo:
 
 ## Repository Layout
 
-- Root workspace: `package.json`, `docker-compose.yml`, `Dockerfile.dev`, `Dockerfile.prod`.
+- Root workspace: `package.json`, `docker/compose.yml`, `docker/compose.dev.yml`, `docker/compose.prod.yml`, `docker/compose.ts`.
 - Backend app: `app/backend`.
 - Frontend app: `app/frontend`.
 - Shared package: `app/shared`.
@@ -67,21 +67,21 @@ Backend build:
 Docker / compose:
 
 - `EXTERNAL_SERVER_PORT` is the host port published by compose.
-- `COMPOSE_PROFILES` selects the `dev` or `prod` compose profile.
+- `npm run docker:compose -- <dev|prod> <docker compose args>` is the supported wrapper command; it calls `docker/compose.ts` and loads `.env` + mode env files.
 
 ## Docker Notes
 
-- Dev image: `Dockerfile.dev`.
-- Prod image: `Dockerfile.prod`.
-- Compose uses `dev` and `prod` profiles.
+- Dev image: `docker/Dockerfile.dev`.
+- Prod image: `docker/Dockerfile.prod`.
+- Compose files live under `docker/` and are invoked via `docker/compose.ts`.
 - `.env.example` documents the compose variables.
 - Dev compose mounts `app/frontend/node_modules` and `app/backend/node_modules` as anonymous volumes to keep host and container installs isolated.
 
-Run profiles with:
+Run Docker with:
 
 ```bash
-docker compose --profile dev up --build
-docker compose --profile prod up --build -d
+npm run docker:compose -- dev up --build
+npm run docker:compose -- prod up --build -d
 ```
 
 ## Editing Rules for Agents

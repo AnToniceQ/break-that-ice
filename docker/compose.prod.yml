@@ -3,8 +3,8 @@ services:
   app:
     working_dir: /app
     build:
-      context: .
-      dockerfile: Dockerfile.prod
+      context: ..
+      dockerfile: docker/Dockerfile.prod
       args:
         MINIFY_BACKEND_BUILD: ${MINIFY_BACKEND_BUILD}
     restart: unless-stopped
