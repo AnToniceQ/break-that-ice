@@ -1,3 +1,5 @@
+name: break-that-ice
+
 services:
   app:
     ports:
