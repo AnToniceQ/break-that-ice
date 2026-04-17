@@ -7,6 +7,7 @@ import { createJsonMiddleware } from "./middleware/json-middleware.js";
 import { createRouterMiddleware } from "./middleware/router/router-middleware.js";
 import { createHttpServer, HttpServer } from "./server/http-server.js";
 import { createSocketServer, SocketServer } from "./server/socket-server.js";
+import { createDatabaseMiddleware } from "./middleware/database/database-middleware.js";
 
 export type IBaseSetupConfiguration = {
   app: express.Express;
@@ -38,6 +39,7 @@ export async function createServerBootstrap(
   const middlewares = [
     createJsonMiddleware(),
     createRouterMiddleware(),
+    createDatabaseMiddleware(),
     ...environmentSetup.middlewares,
   ];
 
