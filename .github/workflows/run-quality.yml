@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup node project
-        uses: ./.github/actions/setup-node-project
+        uses: ./.github/actions/node-project-setup
 
       - name: Install dependencies
         run: ./.github/scripts/install-dependencies.sh
