@@ -3,9 +3,8 @@
   "private": true,
   "version": "0.1.0",
   "workspaces": [
-    "app/shared",
-    "app/backend",
-    "app/frontend"
+    "app/*",
+    ".github/actions/*"
   ],
   "scripts": {
     "prepare": "node .husky/install.mts",
@@ -18,7 +17,8 @@
     "type:check": "tsc --noEmit && npm run type:check -w @break-that-ice/frontend && npm run type:check -w @break-that-ice/backend && npm run type:check -w @break-that-ice/shared",
     "quality": "npm run type:check && npm run lint:check && npm run format:check",
     "build:app:clear": "npm run build:clear -w @break-that-ice/backend && npm run build:clear -w @break-that-ice/frontend",
-    "build:app": "npm run build -w @break-that-ice/backend && npm run build -w @break-that-ice/frontend"
+    "build:app": "npm run build -w @break-that-ice/backend && npm run build -w @break-that-ice/frontend",
+    "build:actions": "npm run build --workspace=.github/actions"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

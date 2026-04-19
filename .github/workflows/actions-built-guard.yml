@@ -1,0 +1,27 @@
+name: Actions built guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - ".github/actions/**"
+      - ".github/workflows/**"
+      - "package.json"
+      - "package-lock.json"
+
+jobs:
+  validate-built-actions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup node project
+        uses: ./.github/actions/node-actions-setup
+
+      - name: Install dependencies
+        run: ./.github/scripts/install-actions-dependencies.sh
+
+      - name: Build action workspaces
+        run: npm run build:actions
+
+      - name: Ensure generated dist is committed
+        run: git diff --exit-code

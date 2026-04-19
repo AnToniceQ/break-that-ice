@@ -1,0 +1,1 @@
+npm ci --workspace=.github/actions

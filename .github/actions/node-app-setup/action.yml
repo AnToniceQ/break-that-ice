@@ -1,4 +1,4 @@
-name: Setup Node Project
+name: Setup Node App Project
 description: Checkout repository and set up Node.js
 
 inputs:

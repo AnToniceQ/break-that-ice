@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup node project
-        uses: ./.github/actions/node-project-setup
+        uses: ./.github/actions/node-app-setup
 
       - name: Install dependencies
-        run: ./.github/scripts/install-dependencies.sh
+        run: ./.github/scripts/install-app-dependencies.sh
 
       - name: Run quality
         run: ./.github/scripts/quality.sh
