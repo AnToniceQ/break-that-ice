@@ -1,4 +1,4 @@
-name: Deploy Main
+name: Deploy 'main' to production
 
 on:
   push:
@@ -10,8 +10,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy-production:
-    name: deploy-production
+  deploy-main:
+    name: deploy-main
     runs-on: ubuntu-latest
     environment: production
     steps:

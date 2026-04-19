@@ -9,23 +9,11 @@ jobs:
     name: run-quality
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
+      - name: Setup node project
+        uses: ./.github/actions/setup-node-project
 
       - name: Install dependencies
-        run: npm ci
+        run: ./.github/scripts/install-dependencies.sh
 
-      - name: Run lint checks
-        run: npm run lint:check
-
-      - name: Run type checks
-        run: npm run type:check
-
-      - name: Run format checks
-        run: npm run format:check
+      - name: Run quality
+        run: ./.github/scripts/quality.sh
