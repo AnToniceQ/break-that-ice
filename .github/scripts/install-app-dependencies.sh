@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-npm ci --workspace=app
+HUSKY=0 npm ci --workspace=app --include-workspace-root
