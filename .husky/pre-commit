@@ -1,1 +1,14 @@
 npx lint-staged
+
+CHANGED=$(git diff --cached --name-only)
+
+changed_actions=$(echo "$CHANGED" | grep '^\.github/actions/' | cut -d/ -f1-3 | sort -u)
+
+if [ -n "$changed_actions" ]; then
+  for action in $changed_actions; do
+    if [ -f "$action/package.json" ]; then
+      npm run build --workspace="$action"
+      git add "$action/dist"
+    fi
+  done
+fi
