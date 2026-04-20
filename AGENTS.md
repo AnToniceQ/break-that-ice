@@ -16,6 +16,9 @@ Maintain and evolve the TypeScript monorepo:
 - Backend app: `app/backend`.
 - Frontend app: `app/frontend`.
 - Shared package: `app/shared`.
+- Local GitHub actions: `.github/actions`.
+- GitHub workflows: `.github/workflows`.
+- GitHub workflow scripts: `.github/scripts`.
 
 ## Commands You Should Use
 
@@ -32,6 +35,7 @@ npm run format:check
 npm run quality
 npm run build:app:clear
 npm run build:app
+npm run build:actions
 ```
 
 Workspace-specific commands:
@@ -43,7 +47,26 @@ npm run build:clear -w @break-that-ice/backend
 npm run build -w @break-that-ice/frontend
 npm run build:clear -w @break-that-ice/frontend
 npm run type:check -w @break-that-ice/shared
+npm run build --workspace=.github/actions/flow-pr
 ```
+
+## Branch, Issue, and PR Flow Rules
+
+The repository uses automated PR flow checks and issue label transitions.
+
+- Issue branch naming must match: `{issueNumber}-{short-name}`.
+- Main progression path: `issue -> dev -> test -> main`.
+- Allowed backports: `main -> test`, `test -> dev`.
+
+Promotion labels managed by automation:
+
+- `reviewing`
+- `dev`
+- `testing`
+- `prepared`
+- `deploying`
+
+Label transitions are enforced in `.github/actions/flow-pr` and triggered by `.github/workflows/flow-pr.yml`.
 
 ## Runtime Model
 
@@ -84,12 +107,22 @@ npm run docker:compose -- dev up --build
 npm run docker:compose -- prod up --build -d
 ```
 
+## GitHub Actions Runtime Notes
+
+- Workflows use a shared local setup action: `.github/actions/node-setup/action.yml`.
+- Any job that uses a local action path (`./.github/actions/...`) must run `actions/checkout` before that step.
+- `actions-built-guard` intentionally uses sparse checkout (`package.json`, `package-lock.json`, `.github`, `.husky`) to validate action builds quickly.
+- The `actions-built-guard` gate expects generated action bundles to be committed.
+- If Husky is not installed/hooked in your environment, run `npm run build:actions` manually before commit.
+- Each action workspace under `.github/actions/*` is expected to commit and push its `dist/` output.
+
 ## Editing Rules for Agents
 
 - Make minimal, targeted edits.
 - Do not revert unrelated user changes.
 - Keep scripts and docs synchronized with the real package manifests.
 - If you remove dependencies, run `npm install` to update the lockfile.
+- After editing action source under `.github/actions/*`, rebuild action bundles with `npm run build:actions`.
 - After changing runtime or build flow, rerun:
   - `npm run type:check`
   - `npm run lint:check`

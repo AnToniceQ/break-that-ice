@@ -20,8 +20,42 @@ TypeScript monorepo with an Express backend and Vue frontend. The backend is the
 │   ├── Dockerfile.dev
 │   ├── Dockerfile.prod
 │   └── compose.ts
+├── .github/
+│   ├── actions/
+│   │   ├── flow-pr/     # PR flow action (source + dist)
+│   │   └── node-setup/  # shared local setup action for workflows
+│   ├── scripts/         # CI shell scripts
+│   └── workflows/       # workflow definitions
 └── package.json
 ```
+
+## Branch, Issue, and PR Flow
+
+Use this repository flow when developing:
+
+- Issue branches must follow `{issueNumber}-{short-name}` (example: `42-fix-login`).
+- Main promotion path is `issue -> dev -> test -> main`.
+- Allowed backports are `main -> test` and `test -> dev`.
+
+The PR flow action (`.github/workflows/flow-pr.yml`) enforces these rules and updates issue labels.
+
+Promotion labels used by the automation:
+
+- `reviewing`
+- `dev`
+- `testing`
+- `prepared`
+- `deploying`
+
+Label behavior:
+
+- Opening/updating `{id}-{name} -> dev`: issue label becomes `reviewing`.
+- Merging `{id}-{name} -> dev`: issue label becomes `dev`.
+- Opening/updating `dev -> test`: `dev` issues become `testing`.
+- Merging `dev -> test`: `testing` issues become `prepared`.
+- Opening/updating `test -> main`: `prepared` issues become `deploying`.
+- Merging `test -> main`: `deploying` issues are closed.
+- Backports (`main -> test`, `test -> dev`): no label changes.
 
 ## Requirements
 
@@ -149,6 +183,7 @@ This issue is truly only Host-related. The ownership change does not affect the 
 - `npm run quality` - run all type, lint and format checks.
 - `npm run build:app:clear` - clear build outputs for backend/frontend
 - `npm run build:app` - build backend and frontend
+- `npm run build:actions` - build all action workspaces in `.github/actions/*`
 
 ## Quality Gates
 
@@ -167,6 +202,20 @@ npm run format:check
 ```
 
 Quality gates are handled automatically by `husky` and `lint-staged`. They are configured and initialized when `npm install` runs on the Host machine.
+
+## Actions Modification Gate
+
+Changes under `.github/actions/**` are protected by the `actions-built-guard` workflow.
+
+- If you modify action source files, regenerate action bundles before pushing:
+
+```bash
+npm run build:actions
+```
+
+- If Husky is not installed or not hooked on your machine/CI clone, run `npm run build:actions` manually before commit.
+- The `dist/` folder of every GitHub Action workspace is expected to be committed and pushed.
+- The guard workflow will fail if generated artifacts are out of sync with committed source.
 
 ## Environments
 
