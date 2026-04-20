@@ -1,0 +1,9 @@
+name: PR flow
+description: Validate PR flow and sync issue labels
+inputs:
+  github-token:
+    description: GitHub token used to call the Issues API
+    required: true
+runs:
+  using: node20
+  main: dist/index.js

@@ -1,30 +1,20 @@
-name: PR Flow Guard
+name: PR flow
 
 on:
   pull_request:
-    branches:
-      - test
-      - main
+    types: [opened, reopened, synchronize, closed]
 
 jobs:
-  guard:
-    name: enforce-pr-flow
+  pr-flow:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
     steps:
-      - name: Validate PR source and target branches
-        run: |
-          echo "Base branch: ${{ github.base_ref }}"
-          echo "Head branch: ${{ github.head_ref }}"
-
-          if [ "${{ github.base_ref }}" = "main" ] && [ "${{ github.head_ref }}" != "test" ]; then
-            echo "::error::Only pull requests from 'test' may be merged into 'main'."
-            exit 1
-          fi
-
-          if [ "${{ github.base_ref }}" = "test" ] && [ "${{ github.head_ref }}" != "dev" ]; then
-            echo "::error::Only pull requests from 'dev' may be merged into 'test'."
-            exit 1
-          fi
-
-          # dev accepts PRs from any branch
-          echo "Branch flow is valid."
+      - name: "Checkout"
+        uses: actions/checkout@v5
+      - name: Validate PR flow and sync issue labels
+        uses: ./.github/actions/flow-pr
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

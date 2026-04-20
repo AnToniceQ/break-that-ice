@@ -1,4 +1,4 @@
-name: Dev PR Checks
+name: PR 'dev' validation
 
 on:
   pull_request:

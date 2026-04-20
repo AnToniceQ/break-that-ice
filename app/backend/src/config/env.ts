@@ -17,3 +17,17 @@ export const SERVER_PORT = (() => {
 
   return parsedPort;
 })();
+
+export const POSTGRES_HOST = getNonEmptyEnvironmentVariable("POSTGRES_HOST");
+
+export const POSTGRES_PORT = (() => {
+  const value = getNonEmptyEnvironmentVariable("POSTGRES_PORT");
+
+  const parsedPort = Number.parseInt(value, 10);
+  if (!Number.isInteger(parsedPort) || parsedPort <= 0 || parsedPort > 65535)
+    throw new Error(
+      "Invalid POSTGRES_PORT environment variable. Expected a valid port number.",
+    );
+
+  return parsedPort;
+})();

@@ -21,4 +21,4 @@ COPY app/shared/package*.json ./app/shared/
 COPY app/backend/package*.json ./app/backend/
 COPY app/frontend/package*.json ./app/frontend/
 
-RUN npm ci
+RUN npm ci --workspace=app

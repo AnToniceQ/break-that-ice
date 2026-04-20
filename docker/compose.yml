@@ -1,7 +1,48 @@
+name: break-that-ice
+
 services:
   app:
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "${EXTERNAL_SERVER_PORT}:3000"
     environment:
       - INTERNAL_SERVER_PORT=3000
       - SECRETS_DIR=/run/secrets
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+    secrets:
+      - postgres_user
+      - postgres_password
+      - postgres_db
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DB_FILE: /run/secrets/postgres_db
+    secrets:
+      - postgres_user
+      - postgres_password
+      - postgres_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+secrets:
+  postgres_user:
+    file: ../.secrets/postgres_user
+  postgres_password:
+    file: ../.secrets/postgres_password
+  postgres_db:
+    file: ../.secrets/postgres_db
+
+volumes:
+  postgres-data:
