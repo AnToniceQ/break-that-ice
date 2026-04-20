@@ -52,6 +52,14 @@ If you intend to use Host-based development, feel free to modify the gitignored 
 
 ### Docker-based
 
+Prepare .env files:
+
+```bash
+cp .env.example .env
+cp .env.dev.example .env.dev
+cp .env.prod.example .env.prod
+```
+
 The repository uses split compose files and a small TypeScript helper script to invoke Docker consistently:
 
 - `docker/compose.yml` - shared service settings
@@ -64,30 +72,10 @@ The helper command is:
 npm run docker:compose -- <dev|prod> <docker compose args>
 ```
 
-For development, prepare env files:
-
-```bash
-cp .env.example .env
-cp .env.dev.example .env.dev
-```
-
 Start development:
 
 ```bash
 npm run docker:compose -- dev up --build
-```
-
-Stop development:
-
-```bash
-npm run docker:compose -- dev down
-```
-
-For production, prepare env files:
-
-```bash
-cp .env.example .env
-cp .env.prod.example .env.prod
 ```
 
 Start production:
@@ -109,7 +97,7 @@ You can see all the variables/arguments needed in [Application environment](#app
 Start the development server:
 
 ```bash
-SECRETS_DIR=./../../.secrets INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./../frontend FRONTEND_INDEX_FILE=index.html npm run dev
+SECRETS_DIR=./../../.secrets INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./../frontend FRONTEND_INDEX_FILE=index.html POSTGRES_HOST=localhost POSTGRES_PORT=5432 npm run dev
 ```
 
 #### Production
@@ -124,7 +112,7 @@ MINIFY_BACKEND_BUILD=false npm run build:app
 Run the app:
 
 ```bash
-SECRETS_DIR=./../../../.secrets INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./../../frontend/dist FRONTEND_INDEX_FILE=index.html node ./app/backend/dist/main.prod.js
+SECRETS_DIR=./../../../.secrets INTERNAL_SERVER_PORT=3000 FRONTEND_DIR=./../../frontend/dist FRONTEND_INDEX_FILE=index.html POSTGRES_HOST=localhost POSTGRES_PORT=5432 node ./app/backend/dist/main.prod.js
 ```
 
 ### Using both Host-based and Docker-based development/production
@@ -196,6 +184,8 @@ We believe that default values in environments obscure the true configuration an
 - `INTERNAL_SERVER_PORT` - port the actual HTTP app is listening on
 - `FRONTEND_DIR` - frontend root/static directory path
 - `FRONTEND_INDEX_FILE` - frontend entry file name
+- `POSTGRES_HOST` - database host name or IP address
+- `POSTGRES_PORT` - database TCP port
 
 ### Docker environment
 
@@ -209,7 +199,13 @@ If on Docker, all secret files from `./.secrets.example` must exist within `./.s
 
 If on Host, all secret files from `./.secrets.example` must exist within the path in `SECRETS_DIR`.
 
-At the moment, no concrete secret files are defined yet in the template.
+The current database secrets are:
+
+- `postgres_user`
+- `postgres_password`
+- `postgres_db`
+
+Docker mounts those secrets into `/run/secrets` for both the app and Postgres containers.
 
 ### Developer-based .env file and secrets
 
