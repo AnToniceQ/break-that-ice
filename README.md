@@ -52,6 +52,14 @@ If you intend to use Host-based development, feel free to modify the gitignored 
 
 ### Docker-based
 
+Prepare .env files:
+
+```bash
+cp .env.example .env
+cp .env.dev.example .env.dev
+cp .env.prod.example .env.prod
+```
+
 The repository uses split compose files and a small TypeScript helper script to invoke Docker consistently:
 
 - `docker/compose.yml` - shared service settings
@@ -64,30 +72,10 @@ The helper command is:
 npm run docker:compose -- <dev|prod> <docker compose args>
 ```
 
-For development, prepare env files:
-
-```bash
-cp .env.example .env
-cp .env.dev.example .env.dev
-```
-
 Start development:
 
 ```bash
 npm run docker:compose -- dev up --build
-```
-
-Stop development:
-
-```bash
-npm run docker:compose -- dev down
-```
-
-For production, prepare env files:
-
-```bash
-cp .env.example .env
-cp .env.prod.example .env.prod
 ```
 
 Start production:
