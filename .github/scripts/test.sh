@@ -1,4 +1,5 @@
 #!/bin/bash
 set -e
 
-npm run lint:check
+npm run test --if-present
+npm run test:e2e --if-present
