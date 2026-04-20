@@ -1,6 +1,6 @@
 import { getInput, setFailed, info } from "@actions/core";
 import { getOctokit, context } from "@actions/github";
-import { createIssueHandler, LABELS } from "./issue-handler";
+import { createIssueHandler, PROMOTION_LABELS } from "./issue-handler";
 
 const PROTECTED_BRANCHES = Object.freeze({
   MAIN: "main",
@@ -49,9 +49,9 @@ async function run() {
       }
 
       if (action !== "closed") {
-        await issues.setLabel(issueNumber, LABELS.REVIEWING);
+        await issues.setPromotionLabel(issueNumber, PROMOTION_LABELS.REVIEWING);
       } else if (merged) {
-        await issues.setLabel(issueNumber, LABELS.DEV);
+        await issues.setPromotionLabel(issueNumber, PROMOTION_LABELS.DEV);
       } else info("Issue PR was closed without merge.");
 
       return;
@@ -60,9 +60,12 @@ async function run() {
     // DEV -> TEST
     if (head === PROTECTED_BRANCHES.DEV && base === PROTECTED_BRANCHES.TEST) {
       if (action !== "closed") {
-        await issues.relabelAll(LABELS.DEV, LABELS.TESTING);
+        await issues.relabelAll(PROMOTION_LABELS.DEV, PROMOTION_LABELS.TESTING);
       } else if (merged) {
-        await issues.relabelAll(LABELS.TESTING, LABELS.PREPARED);
+        await issues.relabelAll(
+          PROMOTION_LABELS.TESTING,
+          PROMOTION_LABELS.PREPARED,
+        );
       } else info("Promotion PR dev -> test was closed without merge.");
 
       return;
@@ -71,9 +74,12 @@ async function run() {
     // TEST -> MAIN
     if (head === PROTECTED_BRANCHES.TEST && base === PROTECTED_BRANCHES.MAIN) {
       if (action !== "closed") {
-        await issues.relabelAll(LABELS.PREPARED, LABELS.DEPLOYING);
+        await issues.relabelAll(
+          PROMOTION_LABELS.PREPARED,
+          PROMOTION_LABELS.DEPLOYING,
+        );
       } else if (merged) {
-        await issues.closeAll(LABELS.DEPLOYING);
+        await issues.closeAll(PROMOTION_LABELS.DEPLOYING);
       } else info("Promotion PR test -> main was closed without merge.");
 
       return;

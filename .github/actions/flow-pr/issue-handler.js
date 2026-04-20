@@ -1,6 +1,6 @@
 import { info } from "@actions/core";
 
-export const LABELS = Object.freeze({
+export const PROMOTION_LABELS = Object.freeze({
   REVIEWING: "reviewing",
   DEV: "dev",
   TESTING: "testing",
@@ -8,33 +8,53 @@ export const LABELS = Object.freeze({
   DEPLOYING: "deploying",
 });
 
+const PROMOTION_LABEL_VALUES = Object.values(PROMOTION_LABELS);
+
+function getLabelName(label) {
+  if (typeof label === "string") {
+    return label;
+  }
+
+  return label?.name;
+}
+
 export function createIssueHandler(octokit, owner, repo) {
-  async function removeLabels(issueNumber) {
-    for (const label of Object.values(LABELS)) {
-      try {
-        await octokit.rest.issues.removeLabel({
-          owner,
-          repo,
-          issue_number: issueNumber,
-          name: label,
-        });
-      } catch (error) {
-        if (error.status !== 404) {
-          throw error;
-        }
-      }
+  async function removePromotionLabels(issueNumber, existingLabels) {
+    let labelsToInspect = existingLabels;
+
+    if (!labelsToInspect) {
+      const response = await octokit.rest.issues.listLabelsOnIssue({
+        owner,
+        repo,
+        issue_number: issueNumber,
+        per_page: 100,
+      });
+      labelsToInspect = response.data;
+    }
+
+    const promotionLabelsToRemove = labelsToInspect
+      .map(getLabelName)
+      .filter((labelName) => PROMOTION_LABEL_VALUES.includes(labelName));
+
+    for (const promotionLabelName of promotionLabelsToRemove) {
+      await octokit.rest.issues.removeLabel({
+        owner,
+        repo,
+        issue_number: issueNumber,
+        name: promotionLabelName,
+      });
     }
   }
 
-  async function setLabel(issueNumber, label) {
-    await removeLabels(issueNumber);
+  async function setPromotionLabel(issueNumber, promotionLabel) {
+    await removePromotionLabels(issueNumber);
     await octokit.rest.issues.addLabels({
       owner,
       repo,
       issue_number: issueNumber,
-      labels: [label],
+      labels: [promotionLabel],
     });
-    info(`#${issueNumber} -> ${label}`);
+    info(`#${issueNumber} -> ${promotionLabel}`);
   }
 
   async function get(issueNumber) {
@@ -53,33 +73,42 @@ export function createIssueHandler(octokit, owner, repo) {
     }
   }
 
-  async function listByLabel(label) {
+  async function listByPromotionLabel(promotionLabel) {
     const issues = await octokit.paginate(octokit.rest.issues.listForRepo, {
       owner,
       repo,
       state: "open",
-      labels: label,
+      labels: promotionLabel,
       per_page: 100,
     });
 
     return issues.filter((item) => !item.pull_request);
   }
 
-  async function relabelAll(fromLabel, toLabel) {
-    const issues = await listByLabel(fromLabel);
-    info(`Relabel ${issues.length} issues: ${fromLabel} -> ${toLabel}`);
+  async function relabelAll(fromPromotionLabel, toPromotionLabel) {
+    const issues = await listByPromotionLabel(fromPromotionLabel);
+    info(
+      `Relabel ${issues.length} issues: ${fromPromotionLabel} -> ${toPromotionLabel}`,
+    );
 
     for (const issue of issues) {
-      await setLabel(issue.number, toLabel);
+      await removePromotionLabels(issue.number, issue.labels);
+      await octokit.rest.issues.addLabels({
+        owner,
+        repo,
+        issue_number: issue.number,
+        labels: [toPromotionLabel],
+      });
+      info(`#${issue.number} -> ${toPromotionLabel}`);
     }
   }
 
-  async function closeAll(label) {
-    const issues = await listByLabel(label);
-    info(`Close ${issues.length} issues with label "${label}"`);
+  async function closeAll(promotionLabel) {
+    const issues = await listByPromotionLabel(promotionLabel);
+    info(`Close ${issues.length} issues with label "${promotionLabel}"`);
 
     for (const issue of issues) {
-      await removeLabels(issue.number);
+      await removePromotionLabels(issue.number, issue.labels);
       await octokit.rest.issues.update({
         owner,
         repo,
@@ -92,7 +121,7 @@ export function createIssueHandler(octokit, owner, repo) {
 
   return {
     get,
-    setLabel,
+    setPromotionLabel,
     relabelAll,
     closeAll,
   };
